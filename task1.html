@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>task1</title>
+	<style>
+		.wrapper{
+			width:220px;
+		}
+		#email-input{
+			width:99%;
+			height:30px;
+			border:1px solid #B5B2B2;
+		}
+		#email-sug-wrapper {
+			border-left:1px solid #B5B2B2;
+			border-right:1px solid #B5B2B2;
+			border-bottom:1px solid #B5B2B2;
+			width:218px;
+			list-style-type: none;
+			padding:0px;
+			margin-top: 0px;
+		}
+		#email-sug-wrapper li{
+			height:25px;
+		}
+		#email-sug-wrapper li:hover{
+			height:23px;
+			background-color: #93DFEA;
+			border-top:1px solid #B5B2B2;
+			border-bottom: 1px solid #B5B2B2;
+		}
+	</style>
+</head>
+<body>
+	<div class="wrapper">
+	    <input id="email-input" type="text">
+	    <ul id="email-sug-wrapper" class="email-sug"></ul>
+	</div>
+	
+</body>
+
+<script type="text/javascript">
+	var box=document.getElementById('email-input');//获取输入框
+	var notebox=document.getElementById('email-sug-wrapper');//获取下拉框
+	var no_li=document.getElementsByTagName('li');//获取所有li标签
+	var postfixList = ['163.com', 'gmail.com', '126.com', 'qq.com', '263.net'];
+	var activeIndex=0;
+
+	window.onload=function(){
+		box.focus();//获得焦点
+	}
+	box.onkeyup= function(event) {//inputDom的输入监听
+		var words=getinput();
+		add(create(words));//获取用户输入，生成提示框中的提示内容，将提示内容添加到email-sug-wrapper中
+		showdiv(words);//控制email-sug-wrapper的显示/隐藏状态    
+	    for (var i = 0; i < no_li.length; i++) {//鼠标点击选择
+		no_li[i].onclick=function(){//对每个标签检查是否有点击事件
+			box.value=this.innerHTML;//获取被点击Li对应的提示内容
+			hide();}
+		}
+		if(event.keyCode==27){
+			//console.log(event.keyCode);
+			box.select();//选中内容
+		}
+		if(notebox.style.display=="block"){//有提示框
+			no_li[0].style.backgroundColor="#F7BBDC";
+		    if(event.keyCode==38||event.keyCode==40||event.keyCode==13){
+		    	if (event.keyCode==38) {//上
+		    	    if (activeIndex!=0) {
+		    	        activeIndex--;
+		    	    } else {
+		    	        activeIndex=no_li.length-1;
+		    	    }
+		    	    no_li[activeIndex].style.backgroundColor="#F7BBDC";
+		    	    no_li[0].style.backgroundColor="#fff";
+		    	}
+		    	if (event.keyCode==40) {//下键
+		    	    if (activeIndex!=no_li.length-1) {
+		    	        activeIndex++;
+		    	    } else {
+		    	        activeIndex=0;
+		    	    }
+		    	    no_li[activeIndex].style.backgroundColor="#F7BBDC";
+		    	    no_li[0].style.backgroundColor="#fff";
+		    	}
+		    	if (event.keyCode==13) {//回车
+		    	    box.value=no_li[activeIndex].innerHTML;//将找到的Li的HTML内容解码后填到input中
+		    	    hide();//隐藏提示框
+		    	}
+		    }   
+	}
+	}
+		    
+	function trim(d){
+		return d.toString().replace(/(^s*)|(s*$)/g, "");//去除前后空格，replace方法必须要字符串使用
+	}
+	
+	function getinput() {//获取用户输入
+		var v=document.getElementById('email-input').value;
+	    return v.toString().replace(/\s/ig,'');//去除半角空格
+	};
+	
+	function create(c) {//生成提示框中的提示内容
+		var str="";
+		if (c.indexOf("@")!=-1) {
+			var g=c.substring(0,c.indexOf('@'));
+			var h=c.substring(c.indexOf('@')+1);
+			var filterResult=postfixList.filter(function(item,index,array){
+				if(item.search(h)==0){
+					return item;
+				}
+			});
+			if (filterResult.length==0) {//当不匹配时显示全部提示
+				filterResult=postfixList;
+			}
+			// console.log(filterResult);
+			for (var i = 0; i < filterResult.length; i++) {
+				str+='<li>'+g+'@'+filterResult[i]+'</li>';
+			}
+		}
+		else{
+		    for (var i = 0; i < postfixList.length; i++) {
+		    	str+='<li>'+c+'@'+postfixList[i]+'</li>';}
+		   }
+	    	return str;//返回生成的提示内容
+	}
+
+	function add(b) {//将提示内容添加到email-sug-wrapper中
+	    //获取生成提示框中的提示内容
+	    notebox.innerHTML=b;//将内容添加到email-sug-wrapper中
+	}
+
+	function showdiv(a) {//控制email-sug-wrapper的显示/隐藏状态
+	    if (a=="") {
+	        hide();
+	    } else {
+	        show();
+	    }
+	}
+
+	function hide() {//隐藏提示框
+	    notebox.style.display="none";
+	}
+	function show() {//显示提示框
+	    notebox.style.display="block";
+	}
+</script>
+</html>
